@@ -17,7 +17,7 @@ contract HenkakuToken is ERC20, Ownable{
     }
 
     function mint(address _to, uint256 amount) public onlyOwner {
-        require(maxSupply <= (totalSupply() + amount), 'EXCEED MAX SUPPLY');
+        require(maxSupply >= (totalSupply() + amount), 'EXCEED MAX SUPPLY');
         _mint(_to, amount);
     }
 
@@ -49,7 +49,7 @@ contract HenkakuToken is ERC20, Ownable{
     }
 
     function addWhitelistUsers(address[] memory users) public onlyAdmin {
-        for (uint256 i = 0; i <= users.length; i ++) {
+        for (uint256 i = 0; i < users.length; i ++) {
             addWhitelistUser(users[i]);
         }
     }
@@ -59,7 +59,7 @@ contract HenkakuToken is ERC20, Ownable{
     }
 
     function removeWhitelistUsers(address[] memory users) public onlyAdmin {
-        for (uint256 i = 0; i <= users.length; i ++) {
+        for (uint256 i = 0; i < users.length; i ++) {
             removeWhitelistUser(users[i]);
         }
     }
@@ -73,7 +73,7 @@ contract HenkakuToken is ERC20, Ownable{
         address to,
         uint256 amount
     ) internal override virtual {
-        require(whitelist[from] || unlock, 'INVALID: SENDER IS NOT ALLOWED');
-        require(whitelist[to] || unlock, 'INVALID: RECEIVER IS NOT ALLOWED');
+        require(whitelist[from] || unlock || from == address(0), 'INVALID: SENDER IS NOT ALLOWED');
+        require(whitelist[to] || unlock || from == address(0), 'INVALID: RECEIVER IS NOT ALLOWED');
     }
 }

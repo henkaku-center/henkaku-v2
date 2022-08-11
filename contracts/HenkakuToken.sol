@@ -33,7 +33,7 @@ contract HenkakuToken is ERC20, Ownable{
     }
 
     modifier onlyAdmin () {
-        require(owner() == msg.sender || gateKeeper == msg.sender || msg.sender == dev, 'INVALID: ONLY ADMIN CAN EXECUTE');
+        require(msg.sender == owner() || msg.sender == gateKeeper || msg.sender == dev, 'INVALID: ONLY ADMIN CAN EXECUTE');
         _;
     }
 

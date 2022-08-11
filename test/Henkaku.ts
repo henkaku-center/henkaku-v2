@@ -36,5 +36,16 @@ describe("Henakaku Token", () => {
         erc20.connect(alice).transfer(bob.address, 20)
       ).to.be.revertedWith('INVALID: RECEIVER IS NOT ALLOWED')
     })
+
+    context('when unlocked', () => {
+      it('sucessfully transfer without allowed list', async () => {
+        await erc20.unLock()
+        await erc20.connect(owner).mint(alice.address, parseUnits('100', 18))
+
+        await expect(
+          erc20.connect(alice).transfer(bob.address, 20)
+        ).to.changeTokenBalances(erc20, [alice, bob], [-20, 20]);
+      })
+    })
   })
 })

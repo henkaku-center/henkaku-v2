@@ -10,6 +10,7 @@ contract HenkakuToken is ERC20, Ownable{
     uint256 private maxSupply = 1_000_000_000e18; // 1 billion henkaku
     mapping(address => bool) private whitelist;
     address public gateKeeper;
+    address public dev;
     bool unlock;
 
     constructor() ERC20("Henkaku", "HENKAKU") {
@@ -32,7 +33,7 @@ contract HenkakuToken is ERC20, Ownable{
     }
 
     modifier onlyAdmin () {
-        require(owner() == msg.sender || gateKeeper == msg.sender, 'INVALID: ONLY ADMIN CAN EXECUTE');
+        require(owner() == msg.sender || gateKeeper == msg.sender || msg.sender == dev, 'INVALID: ONLY ADMIN CAN EXECUTE');
         _;
     }
 
@@ -42,6 +43,10 @@ contract HenkakuToken is ERC20, Ownable{
 
     function unLock() public onlyOwner {
         unlock = true;
+    }
+
+    function setDevAddress(address user) public onlyOwner {
+        dev = user;
     }
 
     function setGateKeeper(address user) public onlyOwner {

@@ -48,4 +48,39 @@ describe("Henakaku Token", () => {
       })
     })
   })
+
+  describe('addWhitelistUsers', () => {
+    it('sucessfully add whitelist users', async () => {
+      expect(await erc20.isAllowed(owner.address)).to.be.eq(false)
+
+      await erc20.addWhitelistUsers([owner.address, alice.address, bob.address])
+      expect(await erc20.isAllowed(owner.address)).to.be.eq(true)
+      expect(await erc20.isAllowed(alice.address)).to.be.eq(true)
+      expect(await erc20.isAllowed(bob.address)).to.be.eq(true)
+    })
+
+    it('sucessfully add whitelist user', async () => {
+      expect(await erc20.isAllowed(owner.address)).to.be.eq(false)
+      await erc20.addWhitelistUser(owner.address)
+      expect(await erc20.isAllowed(owner.address)).to.be.eq(true)
+    })
+
+    it('reverts if user do not have permission', async () => {
+      await expect(
+        erc20.connect(alice).addWhitelistUsers([owner.address, alice.address, bob.address])
+      ).to.be.revertedWith("INVALID: ONLY ADMIN CAN EXECUTE")
+    })
+
+    it('sucessfully addwhitelist user if users is gatekeeper or dev', async () => {
+      await erc20.setGateKeeper(alice.address)
+      await erc20.connect(alice).addWhitelistUsers([owner.address, alice.address, bob.address])
+      expect(await erc20.isAllowed(owner.address)).to.be.eq(true)
+    })
+
+    it('sucessfully addwhitelist user if users is gatekeeper or dev', async () => {
+      await erc20.setDevAddress(bob.address)
+      await erc20.connect(bob).addWhitelistUsers([owner.address, alice.address, bob.address])
+      expect(await erc20.isAllowed(owner.address)).to.be.eq(true)
+    })
+  })
 })

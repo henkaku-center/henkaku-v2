@@ -71,7 +71,7 @@ describe("Henakaku Token", () => {
       ).to.be.revertedWith("INVALID: ONLY ADMIN CAN EXECUTE")
     })
 
-    it('sucessfully addwhitelist user if users is gatekeeper or dev', async () => {
+    it('sucessfully addwhitelist user if users is gatekeeper', async () => {
       await erc20.setGateKeeper(alice.address)
       await erc20.connect(alice).addWhitelistUsers([owner.address, alice.address, bob.address])
       expect(await erc20.isAllowed(owner.address)).to.be.eq(true)

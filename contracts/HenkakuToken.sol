@@ -6,11 +6,11 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract HenkakuToken is ERC20, Ownable{
+contract HenkakuToken is ERC20, Ownable {
     uint256 private maxSupply = 1_000_000_000e18; // 1 billion henkaku
     mapping(address => bool) private whitelist;
-    address public gateKeeper;
-    address public dev;
+    address public gateKeeper; // multisig contract address managed by henkaku community
+    address public dev; // EOA which updates whitelist systematically like using crontab.
     bool unlock;
 
     constructor() ERC20("Henkaku", "HENKAKU") {
@@ -18,26 +18,31 @@ contract HenkakuToken is ERC20, Ownable{
     }
 
     function mint(address _to, uint256 amount) public onlyOwner {
-        require(maxSupply >= (totalSupply() + amount), 'EXCEED MAX SUPPLY');
+        require(maxSupply >= (totalSupply() + amount), "EXCEED MAX SUPPLY");
         _mint(_to, amount);
     }
 
     function burn(address _of, uint256 amount) public onlyOwner {
-        require(unlock == false, 'INVALID: TO OPERATE');
+        require(unlock == false, "INVALID: TO OPERATE");
         _burn(_of, amount);
     }
 
-    modifier onlyAllowed (address sender) {
-        require(whitelist[sender], 'INVALID: NOT ALLOWED');
+    modifier onlyAllowed(address sender) {
+        require(whitelist[sender], "INVALID: NOT ALLOWED");
         _;
     }
 
-    modifier onlyAdmin () {
-        require(msg.sender == owner() || msg.sender == gateKeeper || msg.sender == dev, 'INVALID: ONLY ADMIN CAN EXECUTE');
+    modifier onlyAdmin() {
+        require(
+            msg.sender == owner() ||
+                msg.sender == gateKeeper ||
+                msg.sender == dev,
+            "INVALID: ONLY ADMIN CAN EXECUTE"
+        );
         _;
     }
 
-    function isAllowed (address user) public view onlyOwner returns (bool){
+    function isAllowed(address user) public view onlyOwner returns (bool) {
         return whitelist[user];
     }
 
@@ -54,7 +59,7 @@ contract HenkakuToken is ERC20, Ownable{
     }
 
     function addWhitelistUsers(address[] memory users) public onlyAdmin {
-        for (uint256 i = 0; i < users.length; i ++) {
+        for (uint256 i = 0; i < users.length; i++) {
             addWhitelistUser(users[i]);
         }
     }
@@ -64,7 +69,7 @@ contract HenkakuToken is ERC20, Ownable{
     }
 
     function removeWhitelistUsers(address[] memory users) public onlyAdmin {
-        for (uint256 i = 0; i < users.length; i ++) {
+        for (uint256 i = 0; i < users.length; i++) {
             removeWhitelistUser(users[i]);
         }
     }
@@ -77,8 +82,14 @@ contract HenkakuToken is ERC20, Ownable{
         address from,
         address to,
         uint256 amount
-    ) internal override virtual {
-        require(whitelist[from] || unlock || from == address(0), 'INVALID: SENDER IS NOT ALLOWED');
-        require(whitelist[to] || unlock || from == address(0), 'INVALID: RECEIVER IS NOT ALLOWED');
+    ) internal virtual override {
+        require(
+            whitelist[from] || unlock || from == address(0),
+            "INVALID: SENDER IS NOT ALLOWED"
+        );
+        require(
+            whitelist[to] || unlock || from == address(0),
+            "INVALID: RECEIVER IS NOT ALLOWED"
+        );
     }
 }

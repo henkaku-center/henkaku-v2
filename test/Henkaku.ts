@@ -83,4 +83,51 @@ describe("Henakaku Token", () => {
       expect(await erc20.isAllowed(owner.address)).to.be.eq(true)
     })
   })
+
+  describe('removeWhitelistUsers', () => {
+    it('sucessfully remove whitelist users', async () => {
+      expect(await erc20.isAllowed(owner.address)).to.be.eq(false)
+
+      await erc20.addWhitelistUsers([owner.address, alice.address, bob.address])
+      expect(await erc20.isAllowed(owner.address)).to.be.eq(true)
+
+      await erc20.removeWhitelistUsers([owner.address, alice.address, bob.address])
+      expect(await erc20.isAllowed(owner.address)).to.be.eq(false)
+      expect(await erc20.isAllowed(alice.address)).to.be.eq(false)
+      expect(await erc20.isAllowed(bob.address)).to.be.eq(false)
+    })
+
+    it('sucessfully remove whitelist user', async () => {
+      expect(await erc20.isAllowed(owner.address)).to.be.eq(false)
+      await erc20.addWhitelistUser(owner.address)
+      expect(await erc20.isAllowed(owner.address)).to.be.eq(true)
+
+      await erc20.removeWhitelistUser(owner.address)
+      expect(await erc20.isAllowed(owner.address)).to.be.eq(false)
+    })
+
+    it('reverts if user do not have permission', async () => {
+      await expect(
+        erc20.connect(alice).removeWhitelistUsers([owner.address, alice.address, bob.address])
+      ).to.be.revertedWith("INVALID: ONLY ADMIN CAN EXECUTE")
+    })
+
+    it('sucessfully remove whitelist user if users is gatekeeper', async () => {
+      await erc20.setGateKeeper(alice.address)
+      await erc20.connect(alice).addWhitelistUsers([owner.address, alice.address, bob.address])
+      expect(await erc20.isAllowed(owner.address)).to.be.eq(true)
+
+      await erc20.connect(alice).removeWhitelistUsers([owner.address, alice.address, bob.address])
+      expect(await erc20.isAllowed(owner.address)).to.be.eq(false)
+    })
+
+    it('sucessfully remove whitelist user if users is dev', async () => {
+      await erc20.setDevAddress(bob.address)
+      await erc20.connect(bob).addWhitelistUsers([owner.address, alice.address, bob.address])
+      expect(await erc20.isAllowed(owner.address)).to.be.eq(true)
+
+      await erc20.connect(bob).removeWhitelistUsers([owner.address, alice.address, bob.address])
+      expect(await erc20.isAllowed(owner.address)).to.be.eq(false)
+    })
+  })
 })

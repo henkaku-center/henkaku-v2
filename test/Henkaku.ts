@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { Contract } from "ethers";
+import { constants, Contract } from "ethers";
 import { parseUnits } from "ethers/lib/utils";
 
 describe("Henakaku Token", () => {
@@ -130,4 +130,30 @@ describe("Henakaku Token", () => {
       expect(await erc20.isAllowed(owner.address)).to.be.eq(false)
     })
   })
+
+  describe('burn', () => {
+    beforeEach(async () => {
+      await erc20.addWhitelistUsers([owner.address, alice.address, bob.address, constants.AddressZero])
+      await erc20.connect(owner).mint(alice.address, parseUnits('100', 18))
+    })
+
+    it('sucessfully burn', async () => {
+      await expect(
+        erc20.burn(alice.address, 20)
+      ).to.changeTokenBalances(erc20, [alice], [-20]);
+    })
+
+    it('sucessfully burn if users burn his token', async () => {
+      await expect(
+        erc20.connect(alice).burn(alice.address, 20)
+      ).to.changeTokenBalances(erc20, [alice], [-20]);
+    })
+
+    it('reverts if users burn someones token', async () => {
+      await expect(
+        erc20.connect(alice).burn(owner.address, 20)
+      ).to.be.revertedWith('INVALID: NOT YOUR ASSET')
+    })
+  })
+
 })

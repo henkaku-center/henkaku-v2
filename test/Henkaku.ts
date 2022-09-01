@@ -97,7 +97,7 @@ describe("Henakaku Token", () => {
       expect(await erc20.isAllowed(bob.address)).to.be.eq(false)
     })
 
-    it('sucessfully remove whitelist user', async () => {
+    it('successfully remove whitelist user', async () => {
       expect(await erc20.isAllowed(owner.address)).to.be.eq(false)
       await erc20.addWhitelistUser(owner.address)
       expect(await erc20.isAllowed(owner.address)).to.be.eq(true)

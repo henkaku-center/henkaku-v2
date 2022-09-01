@@ -22,8 +22,11 @@ contract HenkakuToken is ERC20, Ownable {
         _mint(_to, amount);
     }
 
-    function burn(address _of, uint256 amount) public onlyOwner {
-        require(unlock == false, "INVALID: TO OPERATE");
+    function burn(address _of, uint256 amount) public {
+        require(
+            _of == msg.sender || msg.sender == owner(),
+            "INVALID: NOT YOUR ASSET"
+        );
         _burn(_of, amount);
     }
 

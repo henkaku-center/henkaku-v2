@@ -137,7 +137,7 @@ describe("Henakaku Token", () => {
       await erc20.connect(owner).mint(alice.address, parseUnits('100', 18))
     })
 
-    it('sucessfully burn', async () => {
+    it('successfully burn', async () => {
       await expect(
         erc20.burn(alice.address, 20)
       ).to.changeTokenBalances(erc20, [alice], [-20]);

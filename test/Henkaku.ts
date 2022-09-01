@@ -143,7 +143,7 @@ describe("Henakaku Token", () => {
       ).to.changeTokenBalances(erc20, [alice], [-20]);
     })
 
-    it('sucessfully burn if users burn his token', async () => {
+    it('successfully burn if users burn their token', async () => {
       await expect(
         erc20.connect(alice).burn(alice.address, 20)
       ).to.changeTokenBalances(erc20, [alice], [-20]);

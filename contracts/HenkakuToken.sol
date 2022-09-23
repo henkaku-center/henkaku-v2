@@ -13,7 +13,7 @@ contract HenkakuToken is ERC20, Ownable {
     address public dev; // EOA which updates whitelist systematically like using crontab.
     bool unlock;
 
-    constructor() ERC20("Henkaku", "HENKAKU") {
+    constructor() ERC20("HENKAKU", "HENKAKU") {
         unlock = false;
     }
 
